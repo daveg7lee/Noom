@@ -16,7 +16,10 @@ const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 
 wss.on('connection', (socket) => {
-  console.log(socket);
+  socket.on('message', (message) => {
+    console.log(message.toString('utf-8'));
+  });
+  socket.send('Welcome to our Chat');
 });
 
 server.listen(3000, handleListen);
