@@ -15,9 +15,19 @@ const handleListen = () => console.log(`Listening on http://localhost:3000`);
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 
+let sockets = [];
+
 wss.on('connection', (socket) => {
+  sockets.push(socket);
   socket.on('message', (message) => {
-    console.log(message.toString('utf-8'));
+    sockets.forEach((aSocket) => {
+      if (aSocket !== socket) {
+        aSocket.send(message);
+      }
+    });
+  });
+  socket.on('close', () => {
+    sockets = sockets.filter((element) => element !== socket);
   });
   socket.send('Welcome to our Chat');
 });
