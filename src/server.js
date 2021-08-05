@@ -20,11 +20,16 @@ let sockets = [];
 wss.on('connection', (socket) => {
   sockets.push(socket);
   socket.on('message', (message) => {
-    sockets.forEach((aSocket) => {
-      if (aSocket !== socket) {
-        aSocket.send(message);
-      }
-    });
+    const msg = JSON.parse(message);
+    if (msg.type === 'new_message') {
+      sockets.forEach((aSocket) => {
+        if (aSocket !== socket) {
+          aSocket.send(msg.payload);
+        }
+      });
+    } else {
+      console.log(msg.payload);
+    }
   });
   socket.on('close', () => {
     sockets = sockets.filter((element) => element !== socket);
