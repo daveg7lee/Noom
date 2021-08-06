@@ -19,16 +19,20 @@ let sockets = [];
 
 wss.on('connection', (socket) => {
   sockets.push(socket);
+  socket['nickname'] = 'Anon';
   socket.on('message', (message) => {
-    const msg = JSON.parse(message);
-    if (msg.type === 'new_message') {
-      sockets.forEach((aSocket) => {
-        if (aSocket !== socket) {
-          aSocket.send(msg.payload);
-        }
-      });
-    } else {
-      console.log(msg.payload);
+    const parsed = JSON.parse(message);
+    switch (parsed.type) {
+      case 'new_message':
+        sockets.forEach(
+          (aSocket) =>
+            aSocket !== socket &&
+            aSocket.send(`${socket.nickname} : ${parsed.payload}`)
+        );
+        break;
+      case 'nickname':
+        socket['nickname'] = parsed.payload;
+        break;
     }
   });
   socket.on('close', () => {
