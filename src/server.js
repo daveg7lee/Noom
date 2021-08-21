@@ -16,7 +16,10 @@ const server = http.createServer(app);
 const io = SocketIO(server);
 
 io.on('connection', (socket) => {
-  socket.on('enter_room', (msg) => console.log(msg));
+  socket.on('enter_room', (roomName, done) => {
+    console.log(roomName);
+    done("I'm done!");
+  });
 });
 
 server.listen(3000, handleListen);
