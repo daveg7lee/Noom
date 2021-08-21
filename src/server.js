@@ -1,5 +1,5 @@
 import express from 'express';
-import WebSocket from 'ws';
+import SocketIO from 'socket.io';
 import http from 'http';
 
 const app = express();
@@ -13,32 +13,10 @@ app.get('/*', (req, res) => res.redirect('/'));
 const handleListen = () => console.log(`Listening on http://localhost:3000`);
 
 const server = http.createServer(app);
-const wss = new WebSocket.Server({ server });
+const io = SocketIO(server);
 
-let sockets = [];
-
-wss.on('connection', (socket) => {
-  sockets.push(socket);
-  socket['nickname'] = 'Anon';
-  socket.on('message', (message) => {
-    const parsed = JSON.parse(message);
-    switch (parsed.type) {
-      case 'new_message':
-        sockets.forEach(
-          (aSocket) =>
-            aSocket !== socket &&
-            aSocket.send(`${socket.nickname} : ${parsed.payload}`)
-        );
-        break;
-      case 'nickname':
-        socket['nickname'] = parsed.payload;
-        break;
-    }
-  });
-  socket.on('close', () => {
-    sockets = sockets.filter((element) => element !== socket);
-  });
-  socket.send('Welcome to our Chat');
+io.on('connection', (socket) => {
+  socket.on('enter_room', (msg) => console.log(msg));
 });
 
 server.listen(3000, handleListen);
