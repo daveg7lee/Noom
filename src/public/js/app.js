@@ -30,7 +30,7 @@ const handleMsgSubmit = (e) => {
 };
 
 const showRoom = (newCount) => {
-  updateTitle(roomName, 1);
+  updateTitle(roomName, newCount);
   const msgForm = room.querySelector('form');
   welcome.hidden = true;
   room.hidden = false;
