@@ -17,8 +17,8 @@ const io = SocketIO(server);
 
 io.on('connection', (socket) => {
   socket.on('enter_room', (roomName, done) => {
-    console.log(roomName);
-    done("I'm done!");
+    socket.join(roomName);
+    done();
   });
 });
 

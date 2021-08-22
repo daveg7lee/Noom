@@ -2,15 +2,24 @@ const socket = io();
 
 const welcome = document.getElementById('welcome');
 const form = welcome.querySelector('form');
+const room = document.getElementById('room');
 
-const backendDone = (msg) => {
-  console.log(`The Backend says: ${msg}`);
+room.hidden = true;
+
+let roomName;
+
+const showRoom = () => {
+  welcome.hidden = true;
+  room.hidden = false;
+  const h3 = room.querySelector('h3');
+  h3.innerHTML = `Room ${roomName}`;
 };
 
 const handleRoomSubmit = (e) => {
   e.preventDefault();
   const input = form.querySelector('input');
-  socket.emit('enter_room', input.value, backendDone);
+  socket.emit('enter_room', input.value, showRoom);
+  roomName = input.value;
   input.value = '';
 };
 
