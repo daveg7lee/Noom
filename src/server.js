@@ -15,6 +15,18 @@ const handleListen = () => console.log(`Listening on http://localhost:3000`);
 const server = http.createServer(app);
 const io = SocketIO(server);
 
+function publicRooms() {
+  const sids = io.sockets.adapter.sids;
+  const rooms = io.sockets.adapter.rooms;
+  const publicRooms = [];
+  rooms.forEach(({ _, key }) => {
+    if (sids.get(key) === undefined) {
+      publicRooms.push(key);
+    }
+  });
+  return publicRooms;
+}
+
 io.on('connection', (socket) => {
   socket['nickname'] = 'Anon';
   socket.on('enter_room', (roomName, done) => {
