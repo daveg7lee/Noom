@@ -16,10 +16,13 @@ const server = http.createServer(app);
 const io = SocketIO(server);
 
 function publicRooms() {
-  const sids = io.sockets.adapter.sids;
-  const rooms = io.sockets.adapter.rooms;
+  const {
+    sockets: {
+      adapter: { sids, rooms },
+    },
+  } = io;
   const publicRooms = [];
-  rooms.forEach(({ _, key }) => {
+  rooms.forEach((_, key) => {
     if (sids.get(key) === undefined) {
       publicRooms.push(key);
     }
@@ -33,12 +36,16 @@ io.on('connection', (socket) => {
     socket.join(roomName);
     done();
     socket.to(roomName).emit('welcome', socket.nickname);
+    io.sockets.emit('room_change', publicRooms());
   });
   socket.on('disconnecting', () => {
     socket.rooms.forEach(
       (room) => socket.to(room).emit('bye', socket.nickname),
       socket.nickname
     );
+  });
+  socket.on('disconnect', () => {
+    io.sockets.emit('room_change', publicRooms());
   });
   socket.on('new_message', (msg, roomName, done) => {
     socket.to(roomName).emit('new_message', `${socket.nickname}: ${msg}`);
